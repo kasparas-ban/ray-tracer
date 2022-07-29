@@ -6,71 +6,59 @@ import (
 )
 
 type Vec3 struct {
-  x, y, z float64
+  X, Y, Z float64
 }
 
 type Color = Vec3
 type Point3 = Vec3
 
-func NewVec3(x, y, z float64) Vec3 {
-  return Vec3{x, y, z}
+func (v1 Vec3) Add(v2 Vec3) Vec3 {
+  return Vec3{v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z}
 }
 
-func AddVec3(v1, v2 Vec3) Vec3 {
-  return Vec3{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
+func (v1 Vec3) Sub(v2 Vec3) Vec3 {
+  return Vec3{v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z}
 }
 
-func SubVec3(v1, v2 Vec3) Vec3 {
-  return Vec3{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}
+func (v Vec3) AddConst(t float64) Vec3 {
+  return Vec3{v.X + t, v.Y + t, v.Z + t}
 }
 
-func MulVec3(v1, v2 Vec3) Vec3 {
-  return Vec3{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}
+func (v Vec3) Mul(t float64) Vec3 {
+  return Vec3{v.X * t, v.Y * t, v.Z * t}
 }
 
-func AddConstVec3(v Vec3, t float64) Vec3 {
-  return Vec3{v.x + t, v.y + t, v.z + t}
+func (v Vec3) LengthSq() float64 {
+  return math.Pow(v.X, 2) + math.Pow(v.Y, 2) + math.Pow(v.Z, 2)
 }
 
-func MulConstVec3(v Vec3, t float64) Vec3 {
-  return Vec3{v.x * t, v.y * t, v.z * t}
-}
-
-func DivConstVec3(v Vec3, t float64) Vec3 {
-  return Vec3{v.x / t, v.y / t, v.z / t}
-}
-
-func LengthSq(v Vec3) float64 {
-  return math.Pow(v.x, 2) + math.Pow(v.y, 2) + math.Pow(v.z, 2)
-}
-
-func Length(v Vec3) float64 {
-  return math.Sqrt(LengthSq(v))
+func (v Vec3) Length() float64 {
+  return math.Sqrt(v.LengthSq())
 }
 
 // Util functions
 
-func PrintVec(v Vec3) string {
-  return fmt.Sprintf("%v %v %v", v.x, v.y, v.z)
+func (v Vec3) ToString() string {
+  return fmt.Sprintf("%v %v %v", v.X, v.Y, v.Z)
 }
 
-func Dot(v1, v2 Vec3) Vec3 {
-  return Vec3{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}
+func (v1 Vec3) Dot(v2 Vec3) Vec3 {
+  return Vec3{v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z}
 }
 
-func Cross(v1, v2 Vec3) Vec3 {
+func (v1 Vec3) Cross(v2 Vec3) Vec3 {
   return Vec3{
-    v1.y * v2.z - v1.z * v2.y,
-    v1.z * v2.x - v1.x * v2.z,
-    v1.x * v2.y - v1.y * v2.x,
+    v1.Y * v2.Z - v1.Z * v2.Y,
+    v1.Z * v2.X - v1.X * v2.Z,
+    v1.X * v2.Y - v1.Y * v2.X,
   }
 }
 
-func Unit(v Vec3) Vec3 {
-  unit_length := Length(v)
+func (v Vec3) Unit() Vec3 {
+  unit_length := v.Length()
   return Vec3{
-    v.x / unit_length,
-    v.y / unit_length,
-    v.z / unit_length,
+    v.X / unit_length,
+    v.Y / unit_length,
+    v.Z / unit_length,
   }
 }
