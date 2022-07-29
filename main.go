@@ -21,20 +21,14 @@ func main() {
 
   for j := image_height-1; j >= 0; j-- {
     for i := 0; i < image_width; i++ {
-      r := float64(i) /  float64(image_width - 1)
-      g := float64(j) / float64(image_height - 1)
-      b := 0.25
+      pixelColor := utils.NewVec3(
+        float64(i) /  float64(image_width - 1),
+        float64(j) / float64(image_height - 1),
+        0.25,
+      )
 
-      ir := uint8(255 * r)
-      ig := uint8(255 * g)
-      ib := uint8(255 * b)
-
-      line := fmt.Sprintf("%v %v %v\n", ir, ig, ib)
-      f.WriteString(line)
+      f.WriteString(utils.WriteColor(pixelColor))
       bar.Add(1)
     }
   }
-
-  testVec := utils.NewVec3(10, 10, 10)
-  fmt.Println(utils.Length(testVec))
 }
