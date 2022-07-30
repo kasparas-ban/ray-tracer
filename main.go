@@ -3,26 +3,32 @@ package main
 import(
   "fmt"
   "os"
+  "math"
 
   . "example.com/utils"
   "github.com/schollz/progressbar/v3"
 )
 
-func hitSphere(center Point3, radius float64, ray Ray) bool {
+func hitSphere(center Point3, radius float64, ray Ray) float64 {
   oc := ray.Orig.Sub(center)
   a := ray.Dir.Dot(ray.Dir)
   b := 2 * oc.Dot(ray.Dir)
   c := oc.Dot(oc) - radius * radius
   discriminant := b*b - 4*a*c
-  return discriminant > 0
+  if discriminant < 0 {
+    return -1
+  }
+  return (-b - math.Sqrt(discriminant)) / (2 * a)
 }
 
 func rayColor(r Ray) Color {
-  if hitSphere(Point3{0,0,-1}, 0.5, r) {
-    return Color { 1, 0, 0 }
+  t := hitSphere(Point3 { 0, 0, -1 }, 0.5, r)
+  if t > 0 {
+    n := (r.At(t).Sub(Vec3{0,0,-1})).Unit()
+    return (Color { n.X + 1, n.Y + 1, n.Z + 1 }).Mul(0.5)
   }
   unitDirection := r.Dir.Unit()
-  t := 0.5 * (unitDirection.Y + 1)
+  t = 0.5 * (unitDirection.Y + 1)
   color1 := Color { 1, 1, 1 }
   color2 := Color { 0.5, 0.7, 1 }
   return color1.Mul(1 - t).Add(color2.Mul(t))
