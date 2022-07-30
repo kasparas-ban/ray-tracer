@@ -8,7 +8,19 @@ import(
   "github.com/schollz/progressbar/v3"
 )
 
+func hitSphere(center Point3, radius float64, ray Ray) bool {
+  oc := ray.Orig.Sub(center)
+  a := ray.Dir.Dot(ray.Dir)
+  b := 2 * oc.Dot(ray.Dir)
+  c := oc.Dot(oc) - radius * radius
+  discriminant := b*b - 4*a*c
+  return discriminant > 0
+}
+
 func rayColor(r Ray) Color {
+  if hitSphere(Point3{0,0,-1}, 0.5, r) {
+    return Color { 1, 0, 0 }
+  }
   unitDirection := r.Dir.Unit()
   t := 0.5 * (unitDirection.Y + 1)
   color1 := Color { 1, 1, 1 }
@@ -32,7 +44,10 @@ func main() {
   origin := Point3 { 0, 0, 0 }
   horizontal := Vec3 { viewportWidth, 0, 0 }
   vertical := Vec3 { 0, viewportHeight, 0 }
-  lowerLeftCorner := origin.Sub(horizontal.Mul(1/2)).Sub(vertical.Mul(1/2)).Sub(Vec3{ 0, 0, focalLength })
+  lowerLeftCorner := origin.
+    Sub(horizontal.Mul(0.5)).
+    Sub(vertical.Mul(0.5)).
+    Sub(Vec3{ 0, 0, focalLength })
 
   // Render
   f, _ := os.Create("image.ppm")
@@ -48,16 +63,13 @@ func main() {
 
       ray := Ray {
         origin,
-        lowerLeftCorner.Add(horizontal.Mul(u)).Add(vertical.Mul(v)).Sub(origin),
+        lowerLeftCorner.
+          Add(horizontal.Mul(u)).
+          Add(vertical.Mul(v)).
+          Sub(origin),
       }
 
       pixelColor := rayColor(ray)
-
-      //pixelColor := Color {
-      //  float64(i) /  float64(imageWidth - 1),
-      //  float64(j) / float64(imageHeight - 1),
-      //  0.25,
-      //}
 
       f.WriteString(WriteColor(pixelColor))
       bar.Add(1)

@@ -42,8 +42,8 @@ func (v Vec3) ToString() string {
   return fmt.Sprintf("%v %v %v", v.X, v.Y, v.Z)
 }
 
-func (v1 Vec3) Dot(v2 Vec3) Vec3 {
-  return Vec3{v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z}
+func (v1 Vec3) Dot(v2 Vec3) float64 {
+  return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z
 }
 
 func (v1 Vec3) Cross(v2 Vec3) Vec3 {
@@ -55,10 +55,10 @@ func (v1 Vec3) Cross(v2 Vec3) Vec3 {
 }
 
 func (v Vec3) Unit() Vec3 {
-  unit_length := v.Length()
+  unitLength := v.Length()
   return Vec3{
-    v.X / unit_length,
-    v.Y / unit_length,
-    v.Z / unit_length,
+    v.X / unitLength,
+    v.Y / unitLength,
+    v.Z / unitLength,
   }
 }
