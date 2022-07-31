@@ -10,8 +10,7 @@ import (
 )
 
 func rayColor(r Ray, world HittableList) Color {
-	var rec *HitRecord
-	if world.Hit(r, 0, math.Inf(1), rec) {
+	if didHit, rec := world.Hit(r, 0, math.Inf(1), HitRecord{}); didHit {
 		return rec.Normal.Add(Color{1, 1, 1}).Mul(0.5)
 	}
 	unitDirection := r.Dir.Unit()
