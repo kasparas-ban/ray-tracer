@@ -1,84 +1,77 @@
 package main
 
-import(
-  "fmt"
-  "os"
-  "math"
+import (
+	"fmt"
+	"math"
+	"os"
 
-  . "example.com/utils"
-  "github.com/schollz/progressbar/v3"
+	. "example.com/utils"
+	"github.com/schollz/progressbar/v3"
 )
 
-func hitSphere(center Point3, radius float64, ray Ray) float64 {
-  oc := ray.Orig.Sub(center)
-  a := ray.Dir.Dot(ray.Dir)
-  b := 2 * oc.Dot(ray.Dir)
-  c := oc.Dot(oc) - radius * radius
-  discriminant := b*b - 4*a*c
-  if discriminant < 0 {
-    return -1
-  }
-  return (-b - math.Sqrt(discriminant)) / (2 * a)
-}
-
-func rayColor(r Ray) Color {
-  t := hitSphere(Point3 { 0, 0, -1 }, 0.5, r)
-  if t > 0 {
-    n := (r.At(t).Sub(Vec3{0,0,-1})).Unit()
-    return (Color { n.X + 1, n.Y + 1, n.Z + 1 }).Mul(0.5)
-  }
-  unitDirection := r.Dir.Unit()
-  t = 0.5 * (unitDirection.Y + 1)
-  color1 := Color { 1, 1, 1 }
-  color2 := Color { 0.5, 0.7, 1 }
-  return color1.Mul(1 - t).Add(color2.Mul(t))
+func rayColor(r Ray, world HittableList) Color {
+	var rec *HitRecord
+	if world.Hit(r, 0, math.Inf(1), rec) {
+		return rec.Normal.Add(Color{1, 1, 1}).Mul(0.5)
+	}
+	unitDirection := r.Dir.Unit()
+	t := 0.5 * (unitDirection.Y + 1)
+	color1 := Color{1, 1, 1}
+	color2 := Color{0.5, 0.7, 1}
+	return color1.Mul(1 - t).Add(color2.Mul(t))
 }
 
 func main() {
-  // Image
+	// Image
 
-  aspectRatio := 16.0 / 9.0
-  imageWidth := 400
-  imageHeight := int(float64(imageWidth) / aspectRatio)
+	aspectRatio := 16.0 / 9.0
+	imageWidth := 400
+	imageHeight := int(float64(imageWidth) / aspectRatio)
 
-  // Camera
+	// World
 
-  viewportHeight := 2.0
-  viewportWidth := aspectRatio * viewportHeight
-  focalLength := 1.0
+	var world HittableList
+	world.Append(Sphere{Point3{0, 0, -1}, 0.5})
+	world.Append(Sphere{Point3{0, -100.5, -1}, 100})
 
-  origin := Point3 { 0, 0, 0 }
-  horizontal := Vec3 { viewportWidth, 0, 0 }
-  vertical := Vec3 { 0, viewportHeight, 0 }
-  lowerLeftCorner := origin.
-    Sub(horizontal.Mul(0.5)).
-    Sub(vertical.Mul(0.5)).
-    Sub(Vec3{ 0, 0, focalLength })
+	// Camera
 
-  // Render
-  f, _ := os.Create("image.ppm")
-  defer f.Close()
-  f.WriteString(fmt.Sprintf("P3\n%v %v\n255\n", imageWidth, imageHeight))
-  bar := progressbar.Default(int64(imageHeight * imageWidth))
+	viewportHeight := 2.0
+	viewportWidth := aspectRatio * viewportHeight
+	focalLength := 1.0
 
-  for j := imageHeight-1; j >= 0; j-- {
-    for i := 0; i < imageWidth; i++ {
+	origin := Point3{0, 0, 0}
+	horizontal := Vec3{viewportWidth, 0, 0}
+	vertical := Vec3{0, viewportHeight, 0}
+	lowerLeftCorner := origin.
+		Sub(horizontal.Mul(0.5)).
+		Sub(vertical.Mul(0.5)).
+		Sub(Vec3{0, 0, focalLength})
 
-      u := float64(i) / float64(imageWidth - 1)
-      v := float64(j) / float64(imageHeight - 1)
+	// Render
+	f, _ := os.Create("image.ppm")
+	defer f.Close()
+	f.WriteString(fmt.Sprintf("P3\n%v %v\n255\n", imageWidth, imageHeight))
+	bar := progressbar.Default(int64(imageHeight * imageWidth))
 
-      ray := Ray {
-        origin,
-        lowerLeftCorner.
-          Add(horizontal.Mul(u)).
-          Add(vertical.Mul(v)).
-          Sub(origin),
-      }
+	for j := imageHeight - 1; j >= 0; j-- {
+		for i := 0; i < imageWidth; i++ {
 
-      pixelColor := rayColor(ray)
+			u := float64(i) / float64(imageWidth-1)
+			v := float64(j) / float64(imageHeight-1)
 
-      f.WriteString(WriteColor(pixelColor))
-      bar.Add(1)
-    }
-  }
+			ray := Ray{
+				Orig: origin,
+				Dir: lowerLeftCorner.
+					Add(horizontal.Mul(u)).
+					Add(vertical.Mul(v)).
+					Sub(origin),
+			}
+
+			pixelColor := rayColor(ray, world)
+
+			f.WriteString(WriteColor(pixelColor))
+			bar.Add(1)
+		}
+	}
 }
