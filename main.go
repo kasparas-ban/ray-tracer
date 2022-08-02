@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"os"
 
 	. "example.com/utils"
@@ -27,6 +28,7 @@ func main() {
 	aspectRatio := 16.0 / 9.0
 	imageWidth := 400
 	imageHeight := int(float64(imageWidth) / aspectRatio)
+	samples := 100
 
 	// World
 
@@ -48,6 +50,17 @@ func main() {
 		Sub(vertical.Mul(0.5)).
 		Sub(Vec3{0, 0, focalLength})
 
+	cam := Camera{
+		aspectRatio,
+		viewportHeight,
+		viewportWidth,
+		focalLength,
+		origin,
+		horizontal,
+		vertical,
+		lowerLeftCorner,
+	}
+
 	// Render
 	f, _ := os.Create("image.ppm")
 	defer f.Close()
@@ -56,21 +69,15 @@ func main() {
 
 	for j := imageHeight - 1; j >= 0; j-- {
 		for i := 0; i < imageWidth; i++ {
+			pixelColor := Color{0, 0, 0}
+			for s := 0; s < samples; s++ {
+				u := (float64(i) + rand.Float64()) / float64(imageWidth-1)
+				v := (float64(j) + rand.Float64()) / float64(imageHeight-1)
 
-			u := float64(i) / float64(imageWidth-1)
-			v := float64(j) / float64(imageHeight-1)
-
-			ray := Ray{
-				Orig: origin,
-				Dir: lowerLeftCorner.
-					Add(horizontal.Mul(u)).
-					Add(vertical.Mul(v)).
-					Sub(origin),
+				ray := cam.GetRay(u, v)
+				pixelColor = pixelColor.Add(rayColor(ray, world))
 			}
-
-			pixelColor := rayColor(ray, world)
-
-			f.WriteString(WriteColor(pixelColor))
+			f.WriteString(WriteColor(pixelColor, samples))
 			bar.Add(1)
 		}
 	}
