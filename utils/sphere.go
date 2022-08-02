@@ -9,7 +9,7 @@ type Sphere struct {
 	Radius float64
 }
 
-func (s Sphere) Hit(r Ray, tMin float64, tMax float64, rec HitRecord) (bool, HitRecord) {
+func (s Sphere) Hit(r Ray, tMin float64, tMax float64, rec *HitRecord) bool {
 	oc := r.Orig.Sub(s.Center)
 	a := r.Dir.LengthSq()
 	halfB := oc.Dot(r.Dir)
@@ -17,7 +17,7 @@ func (s Sphere) Hit(r Ray, tMin float64, tMax float64, rec HitRecord) (bool, Hit
 
 	discriminant := halfB*halfB - a*c
 	if discriminant < 0 {
-		return false, rec
+		return false
 	}
 
 	sqrtd := math.Sqrt(discriminant)
@@ -27,14 +27,14 @@ func (s Sphere) Hit(r Ray, tMin float64, tMax float64, rec HitRecord) (bool, Hit
 	if root < tMin || tMax < root {
 		root = (-halfB + sqrtd) / a
 		if root < tMin || tMax < root {
-			return false, rec
+			return false
 		}
 	}
 
 	rec.T = root
 	rec.P = r.At(rec.T)
 	outwardNormal := rec.P.Sub(s.Center).Mul(1 / s.Radius)
-	rec = rec.setFaceNormal(r, outwardNormal)
+	*rec = rec.setFaceNormal(r, outwardNormal)
 
-	return true, rec
+	return true
 }

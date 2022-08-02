@@ -1,7 +1,7 @@
 package utils
 
 type Hittable interface {
-	Hit(Ray, float64, float64, HitRecord) (bool, HitRecord)
+	Hit(Ray, float64, float64, *HitRecord) bool
 }
 
 type HittableList []Hittable
@@ -22,25 +22,28 @@ type HitRecord struct {
 }
 
 func (h HitRecord) setFaceNormal(r Ray, outwardNormal Vec3) HitRecord {
-	if frontFace := r.Dir.Dot(outwardNormal) < 0; frontFace {
+	frontFace := r.Dir.Dot(outwardNormal) < 0
+	h.FrontFace = frontFace
+	if frontFace {
 		h.Normal = outwardNormal
+		return h
 	}
 	h.Normal = outwardNormal.Mul(-1)
 	return h
 }
 
-func (hl HittableList) Hit(r Ray, tMin float64, tMax float64, rec HitRecord) (bool, HitRecord) {
-	var tempRec HitRecord = HitRecord{}
+func (hl HittableList) Hit(r Ray, tMin float64, tMax float64, rec *HitRecord) bool {
+	tempRec := HitRecord{}
 	hitAnything := false
 	closestSoFar := tMax
 
 	for _, obj := range hl {
-		if didHit, h := obj.Hit(r, tMin, closestSoFar, tempRec); didHit {
+		if didHit := obj.Hit(r, tMin, closestSoFar, &tempRec); didHit {
 			hitAnything = true
-			closestSoFar = h.T
-			rec = h
+			closestSoFar = tempRec.T
+			*rec = tempRec
 		}
 	}
 
-	return hitAnything, rec
+	return hitAnything
 }
