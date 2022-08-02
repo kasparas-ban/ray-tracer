@@ -17,6 +17,7 @@ func (hl *HittableList) Append(h Hittable) {
 type HitRecord struct {
 	P         Point3
 	Normal    Vec3
+	Mat       Material
 	T         float64
 	FrontFace bool
 }

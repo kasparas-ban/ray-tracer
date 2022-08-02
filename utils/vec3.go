@@ -29,6 +29,10 @@ func (v Vec3) Mul(t float64) Vec3 {
 	return Vec3{v.X * t, v.Y * t, v.Z * t}
 }
 
+func (v1 Vec3) MulVec(v2 Vec3) Vec3 {
+	return Vec3{v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z}
+}
+
 func (v Vec3) LengthSq() float64 {
 	return math.Pow(v.X, 2) + math.Pow(v.Y, 2) + math.Pow(v.Z, 2)
 }
@@ -86,4 +90,13 @@ func RandomInUnitSphere() Vec3 {
 
 func RandomUnitVec() Vec3 {
 	return RandomInUnitSphere().Unit()
+}
+
+func (v Vec3) NearZero() bool {
+	s := 1e-8
+	return (v.X < s) && (v.Y < s) && (v.Z < s)
+}
+
+func Reflect(v Vec3, n Vec3) Vec3 {
+	return v.Add(n.Mul(-v.Dot(n) * 2))
 }
