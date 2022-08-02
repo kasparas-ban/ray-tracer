@@ -10,10 +10,18 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func rayColor(r Ray, world HittableList) Color {
+func rayColor(r Ray, world HittableList, depth int) Color {
 	rec := HitRecord{}
-	if didHit := world.Hit(r, 0, math.Inf(1), &rec); didHit {
-		return rec.Normal.Add(Color{1, 1, 1}).Mul(0.5)
+
+	// If we've exceeded the ray bounce limit, no more light is gathered
+	if depth <= 0 {
+		return Color{0, 0, 0}
+	}
+
+	if didHit := world.Hit(r, 0.001, math.Inf(1), &rec); didHit {
+		target := rec.P.Add(rec.Normal).Add(RandomUnitVec())
+		newRay := Ray{rec.P, target.Sub(rec.P)}
+		return rayColor(newRay, world, depth-1).Mul(0.5)
 	}
 	unitDirection := r.Dir.Unit()
 	t := 0.5 * (unitDirection.Y + 1)
@@ -29,6 +37,7 @@ func main() {
 	imageWidth := 400
 	imageHeight := int(float64(imageWidth) / aspectRatio)
 	samples := 100
+	max_depth := 50
 
 	// World
 
@@ -75,7 +84,7 @@ func main() {
 				v := (float64(j) + rand.Float64()) / float64(imageHeight-1)
 
 				ray := cam.GetRay(u, v)
-				pixelColor = pixelColor.Add(rayColor(ray, world))
+				pixelColor = pixelColor.Add(rayColor(ray, world, max_depth))
 			}
 			f.WriteString(WriteColor(pixelColor, samples))
 			bar.Add(1)

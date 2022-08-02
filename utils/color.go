@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math"
 )
 
 func WriteColor(c Color, samples int) string {
@@ -9,11 +10,11 @@ func WriteColor(c Color, samples int) string {
 	g := c.Y
 	b := c.Z
 
-	// Divide the color by the number of samples
+	// Divide the color by the number of samples and gamma-correct for gamma=2.0
 	scale := 1.0 / float64(samples)
-	r *= scale
-	g *= scale
-	b *= scale
+	r = math.Sqrt(r * scale)
+	g = math.Sqrt(g * scale)
+	b = math.Sqrt(b * scale)
 
 	return fmt.Sprintf("%v %v %v\n",
 		int(256*Clamp(r, 0.0, 0.999)),
