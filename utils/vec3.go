@@ -94,9 +94,16 @@ func RandomUnitVec() Vec3 {
 
 func (v Vec3) NearZero() bool {
 	s := 1e-8
-	return (v.X < s) && (v.Y < s) && (v.Z < s)
+	return (math.Abs(v.X) < s) && (math.Abs(v.Y) < s) && (math.Abs(v.Z) < s)
 }
 
 func Reflect(v Vec3, n Vec3) Vec3 {
 	return v.Add(n.Mul(-v.Dot(n) * 2))
+}
+
+func Refract(uv, n Vec3, etaiOverEtat float64) Vec3 {
+	cosTheta := math.Min(uv.Mul(-1).Dot(n), 1.0)
+	rOutPerp := uv.Add(n.Mul(cosTheta)).Mul(etaiOverEtat)
+	rOutParallel := n.Mul(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSq())))
+	return rOutPerp.Add(rOutParallel)
 }

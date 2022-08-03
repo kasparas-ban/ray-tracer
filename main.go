@@ -47,13 +47,13 @@ func main() {
 	var world HittableList
 
 	materialGround := Lambertian{Color{0.8, 0.8, 0.0}}
-	materialCenter := Lambertian{Color{0.7, 0.3, 0.3}}
-	materialLeft := Metal{Color{0.8, 0.8, 0.8}, 0.3}
-	materialRight := Metal{Color{0.8, 0.6, 0.2}, 1.0}
+	materialCenter := Lambertian{Color{0.1, 0.2, 0.5}}
+	materialLeft := Dielectric{1.5}
+	materialRight := Metal{Color{0.8, 0.6, 0.2}, 0.0}
 
 	world.Append(Sphere{Point3{0, -100.5, -1.0}, 100, materialGround})
 	world.Append(Sphere{Point3{0, 0, -1.0}, 0.5, materialCenter})
-	world.Append(Sphere{Point3{-1.0, 0, -1.0}, 0.5, materialLeft})
+	world.Append(Sphere{Point3{-1.0, 0, -1.0}, -0.4, materialLeft})
 	world.Append(Sphere{Point3{1.0, 0, -1.0}, 0.5, materialRight})
 
 	// Camera
