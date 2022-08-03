@@ -59,12 +59,20 @@ func main() {
 
 	// Camera
 
+	lookfrom := Point3{3, 3, 2}
+	lookat := Point3{0, 0, -1}
+	vup := Vec3{0, 1, 0}
+	focusDist := lookfrom.Sub(lookat).Length()
+	aperture := 2.0
+
 	cam := GetCamera(
-		Point3{-2, 2, 1},
-		Point3{0, 0, -1},
-		Vec3{0, 1, 0},
+		lookfrom,
+		lookat,
+		vup,
 		20,
 		aspectRatio,
+		aperture,
+		focusDist,
 	)
 
 	// Render

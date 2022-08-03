@@ -107,3 +107,15 @@ func Refract(uv, n Vec3, etaiOverEtat float64) Vec3 {
 	rOutParallel := n.Mul(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSq())))
 	return rOutPerp.Add(rOutParallel)
 }
+
+func RandomInUnitDisk() Vec3 {
+	var p Vec3
+	for true {
+		p = Vec3{RandomNum(-1, 1), RandomNum(-1, 1), 0}
+		if p.LengthSq() >= 1 {
+			continue
+		}
+		break
+	}
+	return p
+}
