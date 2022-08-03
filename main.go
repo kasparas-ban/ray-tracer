@@ -53,33 +53,19 @@ func main() {
 
 	world.Append(Sphere{Point3{0, -100.5, -1.0}, 100, materialGround})
 	world.Append(Sphere{Point3{0, 0, -1.0}, 0.5, materialCenter})
-	world.Append(Sphere{Point3{-1.0, 0, -1.0}, -0.4, materialLeft})
+	world.Append(Sphere{Point3{-1.0, 0, -1.0}, 0.5, materialLeft})
+	world.Append(Sphere{Point3{-1.0, 0, -1.0}, -0.45, materialLeft})
 	world.Append(Sphere{Point3{1.0, 0, -1.0}, 0.5, materialRight})
 
 	// Camera
 
-	viewportHeight := 2.0
-	viewportWidth := aspectRatio * viewportHeight
-	focalLength := 1.0
-
-	origin := Point3{0, 0, 0}
-	horizontal := Vec3{viewportWidth, 0, 0}
-	vertical := Vec3{0, viewportHeight, 0}
-	lowerLeftCorner := origin.
-		Sub(horizontal.Mul(0.5)).
-		Sub(vertical.Mul(0.5)).
-		Sub(Vec3{0, 0, focalLength})
-
-	cam := Camera{
+	cam := GetCamera(
+		Point3{-2, 2, 1},
+		Point3{0, 0, -1},
+		Vec3{0, 1, 0},
+		20,
 		aspectRatio,
-		viewportHeight,
-		viewportWidth,
-		focalLength,
-		origin,
-		horizontal,
-		vertical,
-		lowerLeftCorner,
-	}
+	)
 
 	// Render
 	f, _ := os.Create("image.ppm")
