@@ -72,5 +72,5 @@ func Reflectance(cosine, refIdx float64) float64 {
 	// Use Schlick's approximation for reference
 	r0 := (1 - refIdx) / (1 + refIdx)
 	r0 = r0 * r0
-	return r0 + (1-r0)*math.Pow((1-cosine), 5)
+	return r0 + (1-r0)*(1-cosine)*(1-cosine)*(1-cosine)*(1-cosine)*(1-cosine)
 }

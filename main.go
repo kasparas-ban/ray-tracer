@@ -10,6 +10,56 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
+func randomScene() HittableList {
+	var world HittableList
+
+	groundMaterial := Lambertian{Color{0.5, 0.5, 0.5}}
+	world.Append(Sphere{Point3{0, -1000, 0}, 1000, groundMaterial})
+
+	for a := -11; a < 11; a++ {
+		for b := -11; b < 11; b++ {
+			chooseMat := rand.Float64()
+			center := Point3{
+				float64(a) + 0.9*rand.Float64(),
+				0.2,
+				float64(b) + 0.9*rand.Float64(),
+			}
+
+			if center.Sub(Point3{4, 0.2, 0}).Length() > 0.9 {
+				var sphereMat Material
+
+				if chooseMat < 0.8 {
+					// Diffuse
+					albedo := RandomVec().MulVec(RandomVec())
+					sphereMat = Lambertian{albedo}
+					world.Append(Sphere{center, 0.2, sphereMat})
+				} else if chooseMat < 0.95 {
+					// Metal
+					albedo := Color{RandomNum(0.5, 1), RandomNum(0.5, 1), RandomNum(0.5, 1)}
+					fuzz := RandomNum(0, 0.5)
+					sphereMat = Metal{albedo, fuzz}
+					world.Append(Sphere{center, 0.2, sphereMat})
+				} else {
+					// Glass
+					sphereMat = Dielectric{1.5}
+					world.Append(Sphere{center, 0.2, sphereMat})
+				}
+			}
+		}
+	}
+
+	material1 := Dielectric{1.5}
+	world.Append(Sphere{Point3{0, 1, 0}, 1.0, material1})
+
+	material2 := Lambertian{Color{0.4, 0.2, 0.1}}
+	world.Append(Sphere{Point3{-4, 1, 0}, 1.0, material2})
+
+	material3 := Metal{Color{0.7, 0.6, 0.5}, 0.0}
+	world.Append(Sphere{Point3{4, 1, 0}, 1.0, material3})
+
+	return world
+}
+
 func rayColor(r Ray, world HittableList, depth int) Color {
 	rec := HitRecord{}
 
@@ -36,34 +86,23 @@ func rayColor(r Ray, world HittableList, depth int) Color {
 func main() {
 	// Image
 
-	aspectRatio := 16.0 / 9.0
-	imageWidth := 400
+	aspectRatio := 3.0 / 2.0
+	imageWidth := 1200
 	imageHeight := int(float64(imageWidth) / aspectRatio)
 	samples := 100
 	max_depth := 50
 
 	// World
 
-	var world HittableList
-
-	materialGround := Lambertian{Color{0.8, 0.8, 0.0}}
-	materialCenter := Lambertian{Color{0.1, 0.2, 0.5}}
-	materialLeft := Dielectric{1.5}
-	materialRight := Metal{Color{0.8, 0.6, 0.2}, 0.0}
-
-	world.Append(Sphere{Point3{0, -100.5, -1.0}, 100, materialGround})
-	world.Append(Sphere{Point3{0, 0, -1.0}, 0.5, materialCenter})
-	world.Append(Sphere{Point3{-1.0, 0, -1.0}, 0.5, materialLeft})
-	world.Append(Sphere{Point3{-1.0, 0, -1.0}, -0.45, materialLeft})
-	world.Append(Sphere{Point3{1.0, 0, -1.0}, 0.5, materialRight})
+	world := randomScene()
 
 	// Camera
 
-	lookfrom := Point3{3, 3, 2}
-	lookat := Point3{0, 0, -1}
+	lookfrom := Point3{13, 2, 3}
+	lookat := Point3{0, 0, 0}
 	vup := Vec3{0, 1, 0}
-	focusDist := lookfrom.Sub(lookat).Length()
-	aperture := 2.0
+	focusDist := 10.0
+	aperture := 0.1
 
 	cam := GetCamera(
 		lookfrom,

@@ -34,7 +34,7 @@ func (v1 Vec3) MulVec(v2 Vec3) Vec3 {
 }
 
 func (v Vec3) LengthSq() float64 {
-	return math.Pow(v.X, 2) + math.Pow(v.Y, 2) + math.Pow(v.Z, 2)
+	return v.X*v.X + v.Y*v.Y + v.Z*v.Z
 }
 
 func (v Vec3) Length() float64 {
