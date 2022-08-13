@@ -10,4 +10,4 @@ Run `go run main.go` to create an output image called `image.ppm`.
 
 Here's one example result:
 
-![Final scene render](https://github.com/kasparas-ban/ray-tracer/example_image.png "Final scene render")
+![Final scene render](https://github.com/kasparas-ban/ray-tracer/blob/master/example_image.png "Final scene render")
